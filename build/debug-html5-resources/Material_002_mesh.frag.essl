@@ -1,0 +1,62 @@
+#version 100
+#extension GL_EXT_draw_buffers : require
+precision mediump float;
+precision highp int;
+
+uniform highp sampler2D ImageTexture;
+uniform highp sampler2D ImageTexture_002;
+uniform highp sampler2D ImageTexture_001;
+
+varying highp vec3 wposition;
+varying highp mat3 TBN;
+varying highp vec2 texCoord;
+
+highp vec2 octahedronWrap(highp vec2 v)
+{
+    return (vec2(1.0) - abs(v.yx)) * vec2((v.x >= 0.0) ? 1.0 : (-1.0), (v.y >= 0.0) ? 1.0 : (-1.0));
+}
+
+highp float packFloat(highp float f1, highp float f2)
+{
+    return floor(f1 * 100.0) + min(f2, 0.9900000095367431640625);
+}
+
+highp float packFloat2(highp float f1, highp float f2)
+{
+    return floor(f1 * 255.0) + min(f2, 0.9900000095367431640625);
+}
+
+void main()
+{
+    highp vec3 Geometry_Position_res_wt = wposition;
+    highp vec3 Mapping_Vector_res_wt = (Geometry_Position_res_wt * vec3(0.5)) + vec3(0.4999999701976776123046875, -0.4999999701976776123046875, 0.0);
+    highp vec4 ImageTexture_store = texture2D(ImageTexture, vec2(Mapping_Vector_res_wt.x, 1.0 - Mapping_Vector_res_wt.y));
+    highp vec3 _92 = pow(ImageTexture_store.xyz, vec3(2.2000000476837158203125));
+    ImageTexture_store = vec4(_92.x, _92.y, _92.z, ImageTexture_store.w);
+    highp vec4 ImageTexture_002_store = texture2D(ImageTexture_002, vec2(Mapping_Vector_res_wt.x, 1.0 - Mapping_Vector_res_wt.y));
+    highp vec4 ImageTexture_001_store = texture2D(ImageTexture_001, vec2(Mapping_Vector_res_wt.x, 1.0 - Mapping_Vector_res_wt.y));
+    highp vec3 ImageTexture_001_Color_res = ImageTexture_001_store.xyz;
+    highp vec3 n = (ImageTexture_001_Color_res * 2.0) - vec3(1.0);
+    n = normalize(TBN * n);
+    highp vec3 ImageTexture_Color_res = ImageTexture_store.xyz;
+    highp vec3 ImageTexture_002_Color_res = ImageTexture_002_store.xyz;
+    highp vec3 basecol = ImageTexture_Color_res;
+    highp float roughness = ImageTexture_002_Color_res.x;
+    highp float metallic = 0.0;
+    highp float occlusion = 1.0;
+    highp float specular = 1.0;
+    n /= vec3((abs(n.x) + abs(n.y)) + abs(n.z));
+    highp vec2 _164;
+    if (n.z >= 0.0)
+    {
+        _164 = n.xy;
+    }
+    else
+    {
+        _164 = octahedronWrap(n.xy);
+    }
+    n = vec3(_164.x, _164.y, n.z);
+    gl_out[0].gl_FragData = vec4(n.xy, packFloat(metallic, roughness), 1.0 - gl_FragCoord.z);
+    gl_out[1].gl_FragData = vec4(basecol, packFloat2(occlusion, specular));
+}
+
