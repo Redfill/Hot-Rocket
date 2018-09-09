@@ -18,6 +18,7 @@ class RocketHaxe extends iron.Trait {
 		}
 	}
 	public function new() {
+		var Lavel:Vec4 = new Vec4();
 		super();
 		notifyOnUpdate(function() {
 			//set variable
@@ -74,11 +75,26 @@ class RocketHaxe extends iron.Trait {
 				var scene = iron.Scene.active.raw.name;
 				iron.Scene.setActive("scene");
 			}
-			// get local velocity as Lvel
+			// get velocity as Lvel
 			var Lvel:Vec4 = new Vec4();
-			Lvel.x = ma.up().x * rigidBody.getLinearVelocity().x ;
-			Lvel.y = ma.up().y * rigidBody.getLinearVelocity().y ;
-			trace(Lvel);
+			Lvel.x = rigidBody.getLinearVelocity().x ;
+			Lvel.y = rigidBody.getLinearVelocity().y ;
+			var per:Vec4 = new Vec4();
+			if(Lavel != Lvel){
+				per.x = (Lvel.x/(Lavel.x)*100.0);
+				per.y = (Lvel.y/(Lavel.y)*100.0);
+			}
+			if(rigidBody.physics.getContactPairs(rigidBody) != null){
+				if((Math.abs(per.y) < 55.0) || (Math.abs(per.x) < 55.0)){
+					if((Math.abs(Lavel.y) > 1.5) || (Math.abs(Lavel.x) > 1.5)){
+						trace("dead");
+					}
+				}
+			}
+			//trace(per.x);
+			//trace(Lvel.x);
+			Lavel.x = Lvel.x;
+			Lavel.y = Lvel.y;
 		});
 	}
 }
