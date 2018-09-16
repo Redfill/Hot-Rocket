@@ -33,7 +33,6 @@ class RocketHaxe extends iron.Trait {
 			var rot = Math.atan2(-mo.y+height-(height/2),mo.x-(width/2));
 			// set rotation
 			object.transform.rot.fromEuler(1.5708,0.0,rot);
-			object.transform.buildMatrix();
 			var rigidBody = object.getTrait(RigidBody);
 			if (rigidBody != null) rigidBody.syncTransform();
 
@@ -67,12 +66,10 @@ class RocketHaxe extends iron.Trait {
 				rigidBody.applyForce(prop);
 				time = 1.0;
 			}
-			iron.system.Time.scale = time;
-			//failled restart button (idk what i'm doing)
-			if(key.started("r")){
-				var scene = iron.Scene.active.raw.name;
-				iron.Scene.setActive("scene");
+			if(key.down("r")){
+				time = 0.0;
 			}
+			iron.system.Time.scale = time;
 			// get velocity as Lvel
 			var Lvel:Vec4 = new Vec4();
 			Lvel.x = rigidBody.getLinearVelocity().x ;
@@ -84,18 +81,14 @@ class RocketHaxe extends iron.Trait {
 			}
 			//check if hits wall hard enough to kill ya
 			if(rigidBody.physics.getContactPairs(rigidBody) != null){
-				if((Math.abs(per.y) < 55.0) || (Math.abs(per.x) < 55.0)){
-					if((Math.abs(Lavel.y) > 1.5) || (Math.abs(Lavel.x) > 1.5)){
+				if((Math.abs(per.y) < 50.0) || (Math.abs(per.x) < 50.0)){
+					if((Math.abs(Lavel.y) > 2.0) || (Math.abs(Lavel.x) > 2.0)){
 						trace("dead");
 					}
 				}
 			}
-			//trace(per.x);
-			//trace(Lvel.x);
 			Lavel.x = Lvel.x;
 			Lavel.y = Lvel.y;
-			//lock z location of rocket
-			object.transform.loc.z = 1.0;
 		});
 	}
 }
