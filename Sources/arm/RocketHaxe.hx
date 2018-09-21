@@ -33,6 +33,7 @@ class RocketHaxe extends iron.Trait {
 			var rot = Math.atan2(-mo.y+height-(height/2),mo.x-(width/2));
 			// set rotation
 			object.transform.rot.fromEuler(1.5708,0.0,rot);
+			object.transform.buildMatrix();
 			var rigidBody = object.getTrait(RigidBody);
 			if (rigidBody != null) rigidBody.syncTransform();
 
@@ -81,14 +82,15 @@ class RocketHaxe extends iron.Trait {
 			}
 			//check if hits wall hard enough to kill ya
 			if(rigidBody.physics.getContactPairs(rigidBody) != null){
-				if((Math.abs(per.y) < 50.0) || (Math.abs(per.x) < 50.0)){
+				if((Math.abs(per.y) < 45.0) || (Math.abs(per.x) < 45.0)){
 					if((Math.abs(Lavel.y) > 2.0) || (Math.abs(Lavel.x) > 2.0)){
 						trace("dead");
+						light.data.raw.strength = 0;
+						object.removeTrait(object.getTrait(RocketHaxe));
 					}
 				}
 			}
 			Lavel.x = Lvel.x;
 			Lavel.y = Lvel.y;
-		});
 	}
 }
