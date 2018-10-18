@@ -92,5 +92,6 @@ class RocketHaxe extends iron.Trait {
 			}
 			Lavel.x = Lvel.x;
 			Lavel.y = Lvel.y;
+		});
 	}
 }
